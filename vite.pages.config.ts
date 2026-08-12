@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 export default defineConfig(({ command }) => ({
   root: resolve(__dirname, "github-pages"),
-  base: command === "serve" ? "/" : "/august112026/",
+  base: command === "serve" ? "/" : "/august122026/",
   plugins: [react()],
   build: {
     outDir: resolve(__dirname, "dist-pages"),
