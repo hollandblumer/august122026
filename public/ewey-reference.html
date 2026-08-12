@@ -259,7 +259,7 @@ var FILM_CATEGORIES = {
 var MOSAIC_ICONS = ["🎭","🎨","✍️","📷","🎬","🎤","😂","🎵","🐶","☕","🛸","📝"];
 var ADULT_SCENES = ["cold","worldtype","storyworld","entry","experience","create","mosaic","ai","continues","win","local","beyond","creator","end"];
 var JUNIOR_SCENES = ["juniorhub","juniorworlds","newdigs","juniorclassic","juniorvote"];
-var SCENES = ["audience"];
+var SCENES = ["cold","audience"];
 var DARK = {cold:1, mosaic:1, end:1, entry:1};
 
 // ————— State —————
@@ -308,8 +308,8 @@ function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 function chooseAudience(mode){
   clearTimers();
   S.audience = mode || null;
-  SCENES = mode === "adult" ? ADULT_SCENES.slice() : mode === "junior" ? JUNIOR_SCENES.slice() : ["audience"];
-  S.i = 0;
+  SCENES = mode === "adult" ? ADULT_SCENES.slice(1) : mode === "junior" ? JUNIOR_SCENES.slice() : ["cold","audience"];
+  S.i = mode ? 0 : 1;
   render();
 }
 
