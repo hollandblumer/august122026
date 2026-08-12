@@ -163,6 +163,27 @@
 
   .catpill{color:#fff; font-size:14.5px; font-weight:600; padding:9px 18px; border-radius:999px;
     border:1px solid rgba(255,255,255,.22);}
+
+  /* Adult / Junior entry and Junior experience */
+  .audience-grid{grid-template-columns:repeat(2,minmax(260px,1fr)); max-width:720px; gap:18px;}
+  .audience-card{min-height:250px; display:flex; flex-direction:column; justify-content:space-between; padding:30px; color:#fff; border:0;}
+  .audience-card h2{font-size:clamp(28px,4vw,38px); letter-spacing:-.03em; margin-top:12px;}
+  .audience-card p{font-size:15px; line-height:1.55; opacity:.75; margin-top:10px;}
+  .junior-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); max-width:760px; gap:16px;}
+  .junior-accent{border-top:4px solid var(--gold);}
+  .junior-accent.teal{border-top-color:#1E7A8C;}
+  .junior-card-title{font-size:20px; font-weight:700; letter-spacing:-.02em; margin-top:8px;}
+  .junior-copy{font-size:14px; line-height:1.55; color:var(--muted); margin-top:8px;}
+  .junior-pills{display:flex; flex-wrap:wrap; gap:7px; margin-top:16px;}
+  .junior-pill{font-size:11.5px; color:var(--muted); background:var(--canvas); border:1px solid var(--line); border-radius:999px; padding:6px 10px;}
+  .junior-worlds{grid-template-columns:repeat(2,minmax(0,1fr)); max-width:680px; gap:14px;}
+  .junior-icon{font-size:30px; margin-bottom:14px;}
+  .junior-action{display:flex; gap:16px; align-items:flex-start;}
+  .junior-action-icon{font-size:26px; flex:0 0 auto;}
+  .junior-vote{position:relative; overflow:hidden; display:flex; justify-content:space-between; gap:12px; padding:16px 18px;}
+  .junior-vote-fill{position:absolute; inset:0 auto 0 0; background:rgba(30,122,140,.09);}
+  .junior-vote span,.junior-vote b{position:relative; z-index:1;}
+  @media(max-width:620px){.audience-grid,.junior-worlds{grid-template-columns:1fr}.audience-card{min-height:210px}.wrap{padding-top:88px}}
 </style>
 </head>
 <body>
@@ -184,7 +205,7 @@
   </div>
   <div id="chrome" style="display:none">
     <button id="backbtn" onclick="goBack()">&larr; Back</button>
-    <div id="logo">EWE<b>y</b></div>
+    <div id="logo" onclick="chooseAudience()" role="button" tabindex="0" title="Choose Adult or Junior" style="cursor:pointer">EWE<b>y</b></div>
     <div id="spacer"></div>
   </div>
   <div id="scene" class="scene"></div>
@@ -236,13 +257,15 @@ var FILM_CATEGORIES = {
   }
 };
 var MOSAIC_ICONS = ["🎭","🎨","✍️","📷","🎬","🎤","😂","🎵","🐶","☕","🛸","📝"];
-// Development shortcut: keep the opening "Enter EWEy" world sequence out of the route.
-var SCENES = ["cold","worldtype","storyworld","entry","experience","create","mosaic","ai","continues","win","local","beyond","creator","end"];
+var ADULT_SCENES = ["cold","worldtype","storyworld","entry","experience","create","mosaic","ai","continues","win","local","beyond","creator","end"];
+var JUNIOR_SCENES = ["juniorhub","juniorworlds","newdigs","juniorclassic","juniorvote"];
+var SCENES = ["audience"];
 var DARK = {cold:1, mosaic:1, end:1, entry:1};
 
 // ————— State —————
 var startOnWorlds = new URLSearchParams(window.location.search).get("start") === "worldtype";
-var S = {i:startOnWorlds ? 1 : 0, prompt:EXPERIENCES[0], timers:[]};
+if (startOnWorlds) SCENES = ADULT_SCENES.slice();
+var S = {i:startOnWorlds ? 1 : 0, prompt:EXPERIENCES[0], timers:[], audience:startOnWorlds ? "adult" : null};
 
 // Chrome (the EWEy header bar) scrolls away with the page instead of staying pinned.
 (function(){
@@ -277,20 +300,28 @@ function startLive(el, n, dark){
   }, n === 0 ? 700 : 3100);
 }
 function next(){ go(S.i+1); }
-function goBack(){ go(S.i-1); }
+function goBack(){ if (S.i === 0) chooseAudience(); else go(S.i-1); }
 function pickPrompt(idx){ S.prompt = EXPERIENCES[idx]; next(); }
-function restart(){ S.prompt = EXPERIENCES[0]; go(0); }
+function restart(){ S.prompt = EXPERIENCES[0]; chooseAudience(); }
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+function chooseAudience(mode){
+  clearTimers();
+  S.audience = mode || null;
+  SCENES = mode === "adult" ? ADULT_SCENES.slice() : mode === "junior" ? JUNIOR_SCENES.slice() : ["audience"];
+  S.i = 0;
+  render();
+}
 
 // ————— Chrome —————
 function renderChrome(){
   var id = SCENES[S.i];
   var chrome = document.getElementById("chrome");
   var dots = document.getElementById("dots");
-  if (id === "cold"){ chrome.style.display = "none"; dots.style.display = "none"; return; }
+  if (id === "cold" || id === "audience"){ chrome.style.display = "none"; dots.style.display = "none"; return; }
   chrome.style.display = "flex";
   chrome.className = DARK[id] ? "on-dark" : "";
-  document.getElementById("backbtn").style.visibility = id === "worldtype" ? "hidden" : "visible";
+  document.getElementById("backbtn").style.visibility = "visible";
   if (id === "end"){ dots.style.display = "none"; }
   else {
     dots.style.display = "flex";
@@ -302,6 +333,65 @@ function renderChrome(){
 }
 
 // ————— Scene templates —————
+function scAudience(){
+  var el = document.getElementById("scene");
+  el.className = "scene";
+  el.innerHTML = '<div class="wrap wide">' +
+    '<div style="font-size:clamp(52px,9vw,82px); font-weight:700; letter-spacing:-.05em">EWE<span style="color:var(--gold)">y</span></div>' +
+    '<div class="eyebrow" style="margin-top:12px">The participation layer for story worlds</div>' +
+    '<h1 class="md" style="margin-top:34px">How do you want to enter?</h1>' +
+    '<p class="sub">One platform, with experiences designed for each audience.</p>' +
+    '<div class="grid audience-grid">' +
+      '<button class="card click audience-card rise" onclick="chooseAudience(\'adult\')" style="font:inherit; cursor:pointer; background:linear-gradient(135deg,var(--ink),#253654); animation-delay:80ms">' +
+        '<div><span class="chip" style="background:rgba(255,255,255,.12); color:#fff; border-color:rgba(255,255,255,.16)">All story worlds</span><h2>EWEy Adult</h2><p>Film, television, music, sports, books and more — official fan participation across every property.</p></div><b>Enter Adult &rarr;</b>' +
+      '</button>' +
+      '<button class="card click audience-card rise" onclick="chooseAudience(\'junior\')" style="font:inherit; cursor:pointer; background:linear-gradient(135deg,#C6A02E,#9B7216); animation-delay:160ms">' +
+        '<div><span class="chip" style="background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.2)">Ages 5–13</span><h2>EWEy Junior</h2><p>Kid-safe, parent-guided participation through art, performance, voting and stories made together.</p></div><b>Enter Junior &rarr;</b>' +
+      '</button>' +
+    '</div><div style="font-size:12.5px; color:var(--muted); margin-top:24px">One platform. Every story world. Officially.</div></div>';
+}
+
+function scJuniorHub(){
+  var el = document.getElementById("scene");
+  el.className = "scene";
+  el.innerHTML = '<div class="wrap wide"><div class="eyebrow gold">EWEy Junior</div><h1 class="md">Choose an age group.</h1>' +
+    '<p class="sub">Every group has kid-safe participation prompts — parent-guided, no open messaging, and fan work never changes the original canon.</p>' +
+    '<div class="grid junior-grid">' +
+      '<div class="card junior-accent rise"><div class="eyebrow gold" style="margin-bottom:0">Ages 5–7 · Draw &amp; act along</div><div class="junior-card-title">Little Makers</div><p class="junior-copy">Color a character, act out a scene, and send it in with a grown-up. A light, playful format built for any story world.</p><div class="junior-pills"><span class="junior-pill">🐾 New Digs</span><span class="junior-pill">🎬 Hit movies</span><span class="junior-pill">🏆 Classics</span></div></div>' +
+      '<div class="card click junior-accent teal rise" onclick="next()" style="animation-delay:100ms"><div class="eyebrow" style="color:#1E7A8C;margin-bottom:0">Ages 8–10 · Vote &amp; create</div><div class="junior-card-title">Story Squad</div><p class="junior-copy">Vote on where the story goes, then submit art and short videos with a grown-up. This is where official Extras get made.</p><div class="junior-pills"><span class="junior-pill">🐾 New Digs</span><span class="junior-pill">🎬 Hit movies</span><span class="junior-pill">🏆 Classics</span></div><div style="font-size:13px;font-weight:700;color:#1E7A8C;margin-top:16px">See it in action &rarr;</div></div>' +
+      '<div class="card junior-accent rise" style="animation-delay:180ms"><div class="eyebrow gold" style="margin-bottom:0">Ages 11–13 · Build &amp; direct</div><div class="junior-card-title">World Builders</div><p class="junior-copy">Develop characters, direct short scenes, and collaborate through structured, moderated creative challenges.</p><div class="junior-pills"><span class="junior-pill">✍️ Write</span><span class="junior-pill">🎥 Direct</span><span class="junior-pill">🎨 Design</span></div></div>' +
+    '</div></div>';
+}
+
+function scJuniorWorlds(){
+  var el = document.getElementById("scene"); el.className = "scene";
+  var worlds = [["🐾","New Digs","Cheryl Fudge","newdigs()"],["🎬","Biggest Hit Movie","Studio world","juniorclassic()"],["☀️","Indie Favorite","Studio world","juniorclassic()"],["🏰","Beloved Classic","Studio world","juniorclassic()"]];
+  var cards = worlds.map(function(w,i){return '<div class="card click rise" onclick="'+w[3]+'" style="animation-delay:'+(i*70)+'ms"><div class="junior-icon">'+w[0]+'</div><div class="eyebrow '+(i?'':'gold')+'" style="margin-bottom:6px">'+(i?'Studio IP':'EWEy original')+'</div><div class="junior-card-title">'+w[1]+'</div><p class="junior-copy">'+w[2]+'</p></div>';}).join("");
+  el.innerHTML = '<div class="wrap wide"><div class="eyebrow" style="color:#1E7A8C">Story Squad · Ages 8–10</div><h1 class="md">Choose a world.</h1><p class="sub">Vote, draw, film and style — how you play depends on where you land.</p><div class="grid junior-worlds">'+cards+'</div>' +
+    '<div class="card" style="max-width:680px;margin:18px auto 0;background:var(--ink);color:#fff"><div class="eyebrow gold">For studios</div><div class="junior-card-title">Every vote is audience intelligence.</div><p style="font-size:14px;line-height:1.6;opacity:.68;margin-top:8px">See which characters kids love, which twists they want, and which spinoff they would watch next — captured safely and in real time.</p></div></div>';
+}
+function newdigs(){ go(2); }
+function juniorclassic(){ go(3); }
+
+function scNewDigs(){
+  var el=document.getElementById("scene"); el.className="scene";
+  var actions=[["👗","Design the Outfit","Sketch or style this week’s rescue pup for its adoption-day debut. The best look becomes the dog’s official adoption photo."],["💬","Caption the Bark","Put words to what the dogs are thinking. The funniest caption gets animated into the show’s official credits scene."],["🏆","Best in Show","Vote for your favorite look of the week. The winning dog wins the show — and gets adopted on camera."]];
+  el.innerHTML='<div class="wrap"><div class="card" style="background:linear-gradient(135deg,#C23B6B,#7F2653);color:#fff;border:0"><div class="eyebrow" style="color:rgba(255,255,255,.7)">Original · Created by Cheryl Fudge</div><h1 class="md">New Digs</h1><p style="font-size:15px;line-height:1.6;opacity:.8;margin-top:12px">A shelter dog just moved to town and needs a look, a voice and a home. Every week, kids help style it, voice it and vote it into its forever family.</p></div><div class="stack">'+actions.map(function(a,i){return '<div class="card junior-action rise" style="animation-delay:'+(i*80)+'ms"><div class="junior-action-icon">'+a[0]+'</div><div><div class="junior-card-title" style="margin-top:0">'+a[1]+'</div><p class="junior-copy">'+a[2]+'</p></div></div>';}).join('')+'</div></div>';
+}
+
+function scJuniorClassic(){
+  var el=document.getElementById("scene"); el.className="scene";
+  el.innerHTML='<div class="wrap"><div class="card" style="background:linear-gradient(135deg,#7B2D6E,#3E1738);color:#fff;border:0"><div class="eyebrow" style="color:rgba(255,255,255,.7)">A beloved classic movie world</div><h1 class="md">Pick a character. Add a twist.</h1><p style="font-size:15px;line-height:1.6;opacity:.8;margin-top:12px">Act it out with a grown-up. Selected twists become part of an official Junior short — alongside the canon, never rewriting it.</p></div>'+
+    '<div class="grid junior-grid" style="grid-template-columns:repeat(3,1fr);margin-top:20px"><div class="card center"><div class="junior-icon">🦁</div><b>Hero</b></div><div class="card center"><div class="junior-icon">🐭</div><b>Sidekick</b></div><div class="card center"><div class="junior-icon">🐲</div><b>Villain</b></div></div>'+
+    '<div class="card" style="max-width:680px;margin:16px auto 0"><div class="eyebrow gold">Your twist</div><div style="font-size:18px;font-weight:600;line-height:1.5">“What if the Hero has to babysit the Villain’s kid for a day?”</div><div style="margin-top:20px"><button class="btn gold" onclick="next()">Film your 60-second scene &rarr;</button></div><p class="junior-copy">A grown-up submits it. Every entry is reviewed before it can appear.</p></div></div>';
+}
+
+function scJuniorVote(){
+  var el=document.getElementById("scene"); el.className="scene";
+  var votes=[["🏜️ The Desert Kingdom",58],["🌊 The Coral Coast",27],["❄️ The Frost Peaks",15]];
+  el.innerHTML='<div class="wrap"><div class="card" style="background:linear-gradient(135deg,#1D5C7A,#0F3245);color:#fff;border:0"><div class="eyebrow" style="color:rgba(255,255,255,.7)">Only on EWEy · New every Friday</div><h1 class="md">The Hero’s Detour</h1><p style="font-size:15px;line-height:1.6;opacity:.8;margin-top:12px">A companion series built from kid votes. It runs alongside the real story, never changes canon, and only exists here.</p></div><h2 style="font-size:20px;margin:28px 0 14px">Where should the Hero go next?</h2><div class="stack" style="margin-top:0">'+votes.map(function(v){return '<div class="card junior-vote"><div class="junior-vote-fill" style="width:'+v[1]+'%"></div><span>'+v[0]+'</span><b>'+v[1]+'%</b></div>';}).join('')+'</div><div style="font-size:12.5px;color:var(--muted);margin-top:14px">4,281 votes · Closes in 2 days · Reviewed by the studio before it airs</div><div style="margin-top:28px"><button class="btn" onclick="chooseAudience()">Back to Adult / Junior</button></div></div>';
+}
+
 function scCold(){
   var el = document.getElementById("scene");
   el.className = "scene darkscene";
@@ -1527,7 +1617,13 @@ function render(){
   document.getElementById("chrome").style.transform = "translateY(0)";
   var id = SCENES[S.i];
   renderChrome();
-  if (id === "cold") scCold();
+  if (id === "audience") scAudience();
+  else if (id === "juniorhub") scJuniorHub();
+  else if (id === "juniorworlds") scJuniorWorlds();
+  else if (id === "newdigs") scNewDigs();
+  else if (id === "juniorclassic") scJuniorClassic();
+  else if (id === "juniorvote") scJuniorVote();
+  else if (id === "cold") scCold();
   else if (id === "worldtype") scWorldType();
   else if (id === "storyworld") scStoryWorld();
   else if (id === "entry") scEntry();
