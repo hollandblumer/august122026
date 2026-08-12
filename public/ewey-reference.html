@@ -993,7 +993,7 @@ function openGeniusWeedCategories(){
         '<div style="font-size:12.5px; line-height:1.5; color:var(--muted); margin-top:4px">Founder, Sunset Rose Pictures. Former Head of Digital at Red Hour Films (Ben Stiller).</div>' +
       '</div>' +
       '<div style="margin-top:18px; display:grid; gap:12px">' +
-        '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedParticipate()"><div style="font-weight:700; font-size:16px">Participate</div></button>' +
+        '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="document.getElementById(\'peek\').remove(); go(SCENES.indexOf(\'experience\'))"><div style="font-weight:700; font-size:16px">Participate</div></button>' +
         '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedSection(\'league\')"><div style="font-weight:700; font-size:16px">Join the Official Genius Weed League</div></button>' +
         '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedSection(\'recognition\')"><div style="font-weight:700; font-size:16px">Possible Official Experiences &amp; Recognition</div></button>' +
       '</div>' +
@@ -1145,7 +1145,7 @@ function scEntry(){
       '<div style="color:rgba(255,255,255,.65); font-size:12.5px; margin-top:10px">1.2M fans follow this world · Donick\u2019s announcements land here first</div>' +
     '</div>' +
     '<div class="stack" style="margin-top:26px">' +
-      '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedParticipate()"><div style="font-weight:700; font-size:16px">Participate</div></button>' +
+      '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="next()"><div style="font-weight:700; font-size:16px">Participate</div></button>' +
       '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedSection(\'league\')"><div style="font-weight:700; font-size:16px">Join the Official Genius Weed League</div></button>' +
       '<button class="card click" style="padding:18px; font:inherit; text-align:left" onclick="openGeniusWeedSection(\'recognition\')"><div style="font-weight:700; font-size:16px">Possible Official Experiences &amp; Recognition</div></button>' +
     '</div>' +
@@ -1168,26 +1168,6 @@ function openGeniusWeedSection(section){
       '<ul style="margin:14px 0 0; padding-left:20px">' + items + '</ul>' +
       '<div style="margin-top:20px"><button class="btn" style="width:100%" onclick="openGeniusWeedCategories()">Back to Genius Weed</button></div>' +
     '</div></div>';
-}
-
-function openGeniusWeedParticipate(){
-  var m = document.getElementById("peek");
-  if (!m){ m = document.createElement("div"); m.id = "peek"; m.className = "cinema"; m.onclick = function(){ m.remove(); }; document.body.appendChild(m); }
-  var cards = EXPERIENCES.map(function(item, i){
-    return '<button class="card click" style="width:100%;padding:17px;font:inherit;text-align:left" onclick="openGeniusWeedExperience(' + i + ')"><div style="font-weight:700;font-size:15px">' + item.title + '</div><div style="font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:5px">' + item.body + '</div></button>';
-  }).join("");
-  m.innerHTML = '<div class="panel" onclick="event.stopPropagation()"><div style="height:90px;background:' + WORLDS.gw.grad + '"></div><div style="padding:28px">' +
-    '<div style="font-size:12px;font-weight:700;letter-spacing:.12em">GENIUS WEED</div><div style="font-weight:700;font-size:22px;margin-top:12px">Participate</div>' +
-    '<div style="font-size:13.5px;line-height:1.55;color:var(--muted);margin-top:10px">Please click on any of the buttons below for a sampling of additional layers of the EWEy experience.</div>' +
-    '<div style="display:grid;gap:10px;margin-top:16px">' + cards + '</div><div style="margin-top:18px"><button class="btn" style="width:100%" onclick="openGeniusWeedCategories()">Back to Genius Weed</button></div></div></div>';
-}
-
-function openGeniusWeedExperience(idx){
-  var item = EXPERIENCES[idx], m = document.getElementById("peek"); if (!m || !item) return;
-  m.innerHTML = '<div class="panel" onclick="event.stopPropagation()"><div style="height:90px;background:' + WORLDS.gw.grad + '"></div><div style="padding:28px">' +
-    '<div style="font-size:12px;font-weight:700;letter-spacing:.12em">GENIUS WEED · PARTICIPATE</div><div style="font-weight:700;font-size:22px;line-height:1.25;margin-top:12px">' + item.title + '</div>' +
-    '<div style="font-size:14px;line-height:1.6;color:var(--muted);margin-top:12px">' + item.body + '</div><div style="margin-top:18px;background:var(--canvas);border:1px solid var(--line);border-radius:14px;padding:16px"><b>Make your one-minute video</b><div style="font-size:12.5px;color:var(--muted);margin-top:5px">Vertical · Straight from your phone · Creator approval required</div></div>' +
-    '<div style="margin-top:18px"><button class="btn gold" style="width:100%">Upload your video</button></div><div style="margin-top:10px"><button class="btn" style="width:100%" onclick="openGeniusWeedParticipate()">Back to Participate</button></div></div></div>';
 }
 
 function scExperience(){
