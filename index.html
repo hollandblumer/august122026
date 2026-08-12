@@ -1082,17 +1082,13 @@ function openGeniusWeedSection(section){
 function openGeniusWeedParticipate(){
   var m = document.getElementById("peek");
   if (!m){ m = document.createElement("div"); m.id = "peek"; m.className = "cinema"; m.onclick = function(){ m.remove(); }; document.body.appendChild(m); }
-  var vgrads = [WORLDS.gw.grad, WORLDS.ul.grad, WORLDS.lf.grad];
-  var vh = [["@maya.d","❤️ 12.4K"],["@jayden","❤️ 9.1K"],["@sofia.o","❤️ 7.8K"]];
-  var vids = vh.map(function(h, i){ return '<div class="fanvid" style="background:' + vgrads[i] + '"><div class="play">▶</div><div class="cap">' + h[0] + ' · ' + h[1] + '</div><div class="bar" style="animation-delay:' + (i*700) + 'ms"></div></div>'; }).join("");
   var cards = EXPERIENCES.map(function(item, i){
     return '<button class="card click" style="width:100%;padding:17px;font:inherit;text-align:left" onclick="openGeniusWeedExperience(' + i + ')"><div style="font-weight:700;font-size:15px">' + item.title + '</div><div style="font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:5px">' + item.body + '</div></button>';
   }).join("");
   m.innerHTML = '<div class="panel" onclick="event.stopPropagation()"><div style="height:90px;background:' + WORLDS.gw.grad + '"></div><div style="padding:28px">' +
     '<div style="font-size:12px;font-weight:700;letter-spacing:.12em">GENIUS WEED</div><div style="font-weight:700;font-size:22px;margin-top:12px">Participate</div>' +
-    '<div style="margin-top:20px"><div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">This week\u2019s featured fan videos</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">' + vids + '</div><div style="margin-top:12px;font-size:13px;font-weight:600;color:var(--gold)">⭐ Your video could be here by Friday.</div></div>' +
-    '<div style="font-size:13.5px;line-height:1.55;color:var(--muted);margin-top:28px">Please click on any of the buttons below for a sampling of additional layers of the EWEy experience.</div>' +
-    '<div style="display:grid;gap:10px;margin-top:10px">' + cards + '</div><div style="margin-top:18px"><button class="btn" style="width:100%" onclick="openGeniusWeedCategories()">Back to Genius Weed</button></div></div></div>';
+    '<div style="font-size:13.5px;line-height:1.55;color:var(--muted);margin-top:10px">Please click on any of the buttons below for a sampling of additional layers of the EWEy experience.</div>' +
+    '<div style="display:grid;gap:10px;margin-top:16px">' + cards + '</div><div style="margin-top:18px"><button class="btn" style="width:100%" onclick="openGeniusWeedCategories()">Back to Genius Weed</button></div></div></div>';
 }
 
 function openGeniusWeedExperience(idx){
